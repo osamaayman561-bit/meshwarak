@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مشوارك • واجهة الراكب</title>
+<title>مشوارك • طلب مشوار (inDrive)</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -34,16 +34,18 @@ input {
   border: none;
   box-sizing: border-box;
   margin-bottom: 10px;
+  font-size: 15px;
 }
 .btn {
   display: inline-block;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: bold;
   border: none;
   cursor: pointer;
   margin-top: 8px;
+  font-size: 14px;
 }
 .btn-request {
   background-color: #e94560;
@@ -56,28 +58,132 @@ input {
   background-color: #334155;
   color: #ffffff;
 }
+.btn-agree {
+  background-color: #00e676;
+  color: #000000;
+}
+.btn-reject {
+  background-color: #ef4444;
+  color: #ffffff;
+}
+.status-box {
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 12px;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
   <div class="card">
     <h1>واجهة الراكب</h1>
-    <p>اطلب مشوارك بسهولة وحدد نقطة التحرك والوجهة</p>
+    <p>اقترح سعرك، والكباتن ترد عليك بالقبول أو بعرض سعر مناسب</p>
     <a href="index.html" class="btn btn-back">رجوع للبوابة الرئيسية</a>
   </div>
 
   <div class="card">
     <h2>طلب مشوار جديد</h2>
     <label for="pickup">منين؟ (نقطة التحرك)</label>
-    <input id="pickup" type="text" placeholder="مثال: البساتين - مدينة الزهور">
+    <input id="pickup" type="text" placeholder="مثال: مدينة الزهور - البساتين">
 
     <label for="dropoff">رايح فين؟ (الوجهة)</label>
     <input id="dropoff" type="text" placeholder="مثال: المعادي">
 
-    <label for="fare">الأجرة المقترحة (جنيه)</label>
+    <label for="fare">الأجرة المقترحة منك (جنيه)</label>
     <input id="fare" type="number" placeholder="مثال: 90">
 
-    <button class="btn btn-request" onclick="alert('تم إرسال طلب المشوار!')">اطلب المشوار</button>
+    <button class="btn btn-request" onclick="createRide()">إرسال عرض السعر</button>
   </div>
-</body>
-</html>
 
+  <div class="card">
+    <h2>حالة المشوار الحالي</h2>
+    <div id="rideStatus">لا يوجد طلب نشط حالياً.</div>
+  </div>
+
+<script>
+function getRide() {
+  const data = localStorage.getItem('meshwarak_ride');
+  return data ? JSON.parse(data) : null;
+}
+
+function saveRide(ride) {
+  localStorage.setItem('meshwarak_ride', JSON.stringify(ride));
+}
+
+function createRide() {
+  const pickup = document.getElementById('pickup').value.trim();
+  const dropoff = document.getElementById('dropoff').value.trim();
+  const fare = document.getElementById('fare').value.trim();
+
+  if (!pickup || !dropoff || !fare) {
+    alert('من فضلك اكتب نقطة التحرك والوجهة والسعر المقترح.');
+    return;
+  }
+
+  const ride = {
+    pickup,
+    dropoff,
+    clientFare: Number(fare),
+    counterFare: null,
+    status: 'بانتظار رد الكباتن'
+  };
+
+  saveRide(ride);
+  renderRide();
+  alert('تم إرسال طلبك بالسعر المقترح!');
+}
+
+function acceptCounterOffer() {
+  const ride = getRide();
+  if (!ride || !ride.counterFare) return;
+  ride.clientFare = ride.counterFare;
+  ride.status = 'تم الاتفاق على السعر وجارٍ التوجه للراكب';
+  saveRide(ride);
+  renderRide();
+}
+
+function rejectCounterOffer() {
+  const ride = getRide();
+  if (!ride) return;
+  ride.counterFare = null;
+  ride.status = 'تم رفض عرض الكابتن - بانتظار عروض أخرى';
+  saveRide(ride);
+  renderRide();
+}
+
+function renderRide() {
+  const box = document.getElementById('rideStatus');
+  const ride = getRide();
+  if (!ride) {
+    box.innerHTML = 'لا يوجد طلب نشط حالياً.';
+    return;
+  }
+
+  let counterHtml = '';
+  if (ride.counterFare && ride.status === 'عرض سعر جديد من الكابتن') {
+    counterHtml = `
+      <div class="status-box">
+        <strong>عرض سعر جديد من الكابتن: ${ride.counterFare} جنيه</strong><br>
+        <button class="btn btn-agree" onclick="acceptCounterOffer()">موافقة على السعر</button>
+        <button class="btn btn-reject" onclick="rejectCounterOffer()">رفض العرض</button>
+      </div>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="status-box">
+      <div><strong>من:</strong> ${ride.pickup}</div>
+      <div><strong>إلى:</strong> ${ride.dropoff}</div>
+      <div><strong>السعر الحالي:</strong> ${ride.clientFare} جنيه</div>
+      <div><strong>الحالة:</strong> ${ride.status}</div>
+    </div>
+    ${counterHtml}
+  `;
+}
+
+renderRide();
+</script>
+</body>
+      </html>
+      
