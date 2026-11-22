@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مشوارك • واجهة الكابتن</title>
+<title>مشوارك • واجهة الراكب</title>
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -20,7 +20,20 @@ body {
 }
 h1, h2 {
   margin-top: 0;
-  color: #00e676;
+  color: #e94560;
+}
+label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  box-sizing: border-box;
+  margin-bottom: 10px;
 }
 .btn {
   display: inline-block;
@@ -32,9 +45,12 @@ h1, h2 {
   cursor: pointer;
   margin-top: 8px;
 }
-.btn-accept {
-  background-color: #00e676;
-  color: #000000;
+.btn-request {
+  background-color: #e94560;
+  color: #ffffff;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
 }
 .btn-back {
   background-color: #334155;
@@ -44,15 +60,23 @@ h1, h2 {
 </head>
 <body>
   <div class="card">
-    <h1>واجهة الكابتن</h1>
-    <p>استقبال الطلبات وإدارة حالة المشوار</p>
+    <h1>واجهة الراكب</h1>
+    <p>اطلب مشوارك بسهولة وحدد نقطة التحرك والوجهة</p>
     <a href="index.html" class="btn btn-back">رجوع للبوابة الرئيسية</a>
   </div>
 
   <div class="card">
-    <h2>الطلبات المتاحة حالياً</h2>
-    <p>مثال طلب: من مدينة الزهور - البساتين إلى المعادي • الأجرة المقترحة: 90 جنيه</p>
-    <button class="btn btn-accept" onclick="alert('تم قبول الطلب بنجاح!')">قبول المشوار</button>
+    <h2>طلب مشوار جديد</h2>
+    <label for="pickup">منين؟ (نقطة التحرك)</label>
+    <input id="pickup" type="text" placeholder="مثال: البساتين - مدينة الزهور">
+
+    <label for="dropoff">رايح فين؟ (الوجهة)</label>
+    <input id="dropoff" type="text" placeholder="مثال: المعادي">
+
+    <label for="fare">الأجرة المقترحة (جنيه)</label>
+    <input id="fare" type="number" placeholder="مثال: 90">
+
+    <button class="btn btn-request" onclick="alert('تم إرسال طلب المشوار!')">اطلب المشوار</button>
   </div>
 </body>
 </html>
